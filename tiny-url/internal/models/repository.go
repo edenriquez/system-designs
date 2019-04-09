@@ -1,7 +1,7 @@
 package db
 
 import (
-	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/go-xorm/xorm"
@@ -25,9 +25,22 @@ type Users struct {
 	Updated  time.Time `xorm:"updated"`
 }
 
+// Tables is the generi struct to map all the models
+
+func migrationGroup() []interface{} {
+	var tables []interface{}
+	tables = append(tables, &Urls{})
+	tables = append(tables, &Users{})
+	return tables
+}
+
 func tableMigrationProcess(newdriver *xorm.Engine) {
-	err := newdriver.Sync2(new(Urls))
-	fmt.Println(err)
-	err = newdriver.Sync2(new(Users))
-	fmt.Println(err)
+	for _, table := range migrationGroup() {
+		err := newdriver.Sync2(table)
+		if err != nil {
+			tname := reflect.TypeOf(table).String()
+			println("There is an error while creating: ", tname)
+		}
+	}
+
 }
