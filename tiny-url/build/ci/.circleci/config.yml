@@ -1,0 +1,31 @@
+version: 2 
+jobs: 
+  build: 
+    docker: 
+      - image: circleci/golang:1.12
+      - image: circleci/postgres:9.6-alpine
+        environment: 
+          POSTGRES_USER: postgres
+          POSTGRES_DB: tiny_url_db
+    
+    working_directory: go/src/github.com/edenriquez/system-designs/tiny-url
+
+    
+    steps: 
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+
+      - run:
+          name: Run unit tests
+          command: go test ./...
+          # command: |
+          #   trap "go-junit-report <${TEST_RESULTS}/go-test.out > ${TEST_RESULTS}/go-test-report.xml" EXIT
+          #   make test | tee ${TEST_RESULTS}/go-test.out

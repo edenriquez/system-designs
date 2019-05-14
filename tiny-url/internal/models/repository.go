@@ -25,8 +25,7 @@ type Users struct {
 	Updated  time.Time `xorm:"updated"`
 }
 
-// Tables is the generi struct to map all the models
-
+// migrationGroup is the generi struct to map all the models
 func migrationGroup() []interface{} {
 	var tables []interface{}
 	tables = append(tables, &Urls{})
@@ -34,6 +33,7 @@ func migrationGroup() []interface{} {
 	return tables
 }
 
+// tableMigrationProcess iterats models and creates them
 func tableMigrationProcess(newdriver *xorm.Engine) {
 	for _, table := range migrationGroup() {
 		err := newdriver.Sync2(table)
